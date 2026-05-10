@@ -569,23 +569,27 @@ tab1, tab2, tab3 = st.tabs(["🤖 PitchSmart AI", "📊 Dashboard", "📈 Team A
 # TAB 1 — PITCHSMART AI
 # ════════════════════════════════════════════════════════════════════════════════
 with tab1:
-    # API key stored in session state via sidebar
-    with st.sidebar:
-        st.markdown("### ⚙️ PitchSmart Settings")
-        api_key_input = st.text_input(
-            "Gemini API Key",
-            type="password",
-            placeholder="Paste your Gemini API key...",
-            help="Get a free key at aistudio.google.com",
-            key="api_key_stored"
-        )
-        if api_key_input:
-            st.session_state["gemini_key"] = api_key_input
-            st.success("API key saved ✅")
-        st.markdown("---")
-        st.markdown('<p style="font-size:0.75rem;color:#7A90A8">Your key is stored locally in this session only and never shared.</p>', unsafe_allow_html=True)
+    # Load API key from Streamlit secrets or sidebar fallback
+    api_key = ""
+    try:
+        api_key = st.secrets["GEMINI_KEY"]
+    except:
+        pass
 
-    api_key = st.session_state.get("gemini_key", "")
+    if not api_key:
+        with st.sidebar:
+            st.markdown("### ⚙️ PitchSmart Settings")
+            api_key_input = st.text_input(
+                "Gemini API Key",
+                type="password",
+                placeholder="Paste your Gemini API key...",
+                help="Get a free key at aistudio.google.com",
+                key="api_key_stored"
+            )
+            if api_key_input:
+                st.session_state["gemini_key"] = api_key_input
+                st.success("API key saved ✅")
+        api_key = st.session_state.get("gemini_key", "")
 
     st.markdown('<div class="ai-box">', unsafe_allow_html=True)
     st.markdown("""
@@ -874,5 +878,3 @@ with tab3:
             )
             st.plotly_chart(fig4, use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
-
-
